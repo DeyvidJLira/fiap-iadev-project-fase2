@@ -2,10 +2,10 @@ from typing import Tuple
 import pygame
 
 class Attraction:
-    def __init__(self, name: str, image_path: str,  cost: int, time: float, location: Tuple[float, float]):
+    def __init__(self, name: str, image_path: str,  cost: int, score: float, location: Tuple[float, float]):
         self.name = name
         self.cost = cost
-        self.time = time
+        self.score = score
         self.location = location
         self.image = pygame.image.load(image_path)
 

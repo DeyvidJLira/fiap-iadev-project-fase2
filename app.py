@@ -1,6 +1,6 @@
 from setup import *
 from draw_functions import draw_attractions, draw_paths, draw_plot, draw_text
-from util import calculate_total_distance, calculate_total_cost
+from util import calculate_total_distance, calculate_total_events_until_budget, calculate_total_cost_limited
 from enum import Enum
 from genetic_algorithm import MutateMethod, create_roadmap, calculate_fitness, crossover, mutate
 
@@ -64,15 +64,23 @@ class App():
 
         draw_attractions(self.screen)
 
-        self.population.sort(key=lambda it: calculate_fitness(it), reverse=False)
+        self.population.sort(key=lambda it: calculate_fitness(it, BUDGET_MAX), reverse=False)
 
         new_population = [self.population[0]]
 
-        self.best_fitness = calculate_fitness(self.population[0])
+        self.best_fitness = calculate_fitness(self.population[0], BUDGET_MAX)
         self.best_solution = self.population[0]
 
         self.best_fitness_values.append(self.best_fitness)
         self.best_solutions.append(self.best_solution)
+
+        draw_plot(self.screen, list(range(len(self.best_fitness_values))),
+              self.best_fitness_values, y_label="Fitness")
+
+        draw_paths(self.screen, path=[it.location for it in self.best_solution], rgb_color=PATH_BEST_SOLUTION, width=3)
+        draw_paths(self.screen, path=[it.location for it in self.population[1]], rgb_color=PATH_COLOR, width=3)
+        
+        print(f"Generation {self.generation} Total Distance the best {calculate_total_distance(self.best_solution):.2f}km and Total cost: R$ {calculate_total_cost_limited(self.best_solution, BUDGET_MAX):.2f}")
 
         if(self.generation >= N_GENERATIONS):
             self.state = State.IN_ALG_FINISHED
@@ -80,26 +88,19 @@ class App():
         else:
             self.generation = next(self.generation_counter)
 
-        draw_plot(self.screen, list(range(len(self.best_fitness_values))),
-              self.best_fitness_values, y_label="Fitness - Distance (KMs)")
+            while len(new_population) < POPULATION_SIZE:
+                parent1, parent2 = random.choices(self.population[:10], k=2)
 
-        draw_paths(self.screen, path=[it.location for it in self.best_solution], rgb_color=PATH_BEST_SOLUTION, width=3)
-        draw_paths(self.screen, path=[it.location for it in self.population[1]], rgb_color=PATH_COLOR, width=3)
-        
-        print(f"Generation {self.generation} Total Distance the best {calculate_total_distance(self.best_solution):.2f}km and Total cost: R$ {calculate_total_cost(self.best_solution):.2f}")
+                child1, child2 = crossover(parent1, parent2)
 
-        while len(new_population) < POPULATION_SIZE:
-            parent1, parent2 = random.choices(self.population[:10], k=2)
+                child1 = mutate(MutateMethod.INVERSION, child1, MUTATION_PROBABILITY)
+                child2 = mutate(MutateMethod.INVERSION, child2, MUTATION_PROBABILITY)
 
-            child1, child2 = crossover(parent1, parent2)
+                new_population.append(child1)
+                new_population.append(child2)
 
-            child1 = mutate(MutateMethod.SWAP, child1, MUTATION_PROBABILITY)
-            child2 = mutate(MutateMethod.SWAP, child2, MUTATION_PROBABILITY)
-
-            new_population.append(child1)
-            new_population.append(child2)
-
-        self.population = new_population
+            self.population = new_population
+            
 
         pygame.display.flip()
 
@@ -111,7 +112,7 @@ class App():
         self.screen.blit(BACKGROUND, (0, 0))
 
         draw_attractions(self.screen)     
-        draw_plot(self.screen, list(range(len(self.best_fitness_values))), self.best_fitness_values, y_label="Fitness - Distance (KMs)")
+        draw_plot(self.screen, list(range(len(self.best_fitness_values))), self.best_fitness_values, y_label="Fitness")
         draw_paths(self.screen, [it.location for it in self.best_solutions[0]], rgb_color=PATH_BEST_SOLUTION, width=3)    
         draw_text(self.screen, "Press 'enter' to show report", (500, 60))
 
@@ -128,8 +129,9 @@ class App():
         y = 150
 
         best_roadmap = self.population[0]
-        for index, attraction in enumerate(best_roadmap):
-            draw_text(self.screen, f"{attraction.name}: Custo R${attraction.cost}, Tempo {attraction.time}", (300, y + (index * 25)))
+        total_events = calculate_total_events_until_budget(best_roadmap, BUDGET_MAX)
+        for index, attraction in enumerate(best_roadmap[:total_events]):
+            draw_text(self.screen, f"{attraction.name}: Custo R${attraction.cost}, Score {attraction.score}", (300, y + (index * 25)))
             
         pygame.display.flip()
         self.clock.tick(FPS)

@@ -33,3 +33,33 @@ def calculate_total_cost(roadmap: List[Attraction]) -> float:
     return total_cost
 
 
+def calculate_total_events_until_budget(roadmap: List[Attraction], budget_max: float) -> int:
+    budget = 0
+    total_events = 0
+
+    for attraction in roadmap:
+        if(budget + attraction.cost > budget_max):
+            break
+        else:
+            budget += attraction.cost
+            total_events += 1
+
+    return total_events
+
+
+def calculate_total_cost_limited(roadmap: List[Attraction], budget_max: float) -> float:
+    total_events = calculate_total_events_until_budget(roadmap, budget_max)
+
+    total_cost = sum(
+       it.cost for it in roadmap[:total_events]
+    )
+    return total_cost
+
+
+def calculate_total_score_limited(roadmap: List[Attraction], budget_max: float) -> float:
+    total_events = calculate_total_events_until_budget(roadmap, budget_max)
+
+    total_score = sum(
+       it.score for it in roadmap[:total_events]
+    )
+    return total_score

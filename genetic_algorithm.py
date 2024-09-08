@@ -1,11 +1,11 @@
 from enum import Enum
 from attraction import Attraction
 from typing import List
-from util import calculate_total_distance, calculate_total_cost
+from util import calculate_total_distance, calculate_total_events_until_budget, calculate_total_score_limited
 import random
 
-def calculate_fitness(roadmap: List[Attraction]):
-    return calculate_total_distance(roadmap)
+def calculate_fitness(roadmap: List[Attraction], budget_max: float):
+    return calculate_total_distance(roadmap) - calculate_total_events_until_budget(roadmap, budget_max) - calculate_total_score_limited(roadmap, budget_max)
 
 
 def create_roadmap(attractions) -> List[Attraction]:
@@ -17,17 +17,6 @@ def create_roadmap(attractions) -> List[Attraction]:
         roadmap.append(attraction)
     return roadmap
 
-# def create_roadmap(attractions, budget_max) -> List[Attraction]:
-#     attractions_cp = attractions[:]
-#     roadmap = []
-#     budget = 0
-#     while budget < budget_max * 0.9 and len(attractions_cp) > 0:
-#         attraction = random.choice(attractions_cp)
-#         attractions_cp.remove(attraction)
-#         if budget + attraction.cost <= budget_max:
-#             roadmap.append(attraction)
-#             budget += attraction.cost
-#     return roadmap
 
 def crossover(roadmap1: List[Attraction], roadmap2: List[Attraction]) -> tuple[List[Attraction], List[Attraction]]:
     parent1_lenght = len(roadmap1)
