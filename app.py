@@ -16,6 +16,7 @@ class State(Enum):
     IN_ALG_FINISHED = 2
     IN_REPORT = 3
 
+
 class App():
     def __init__(self) -> None:
         pygame.init()
@@ -103,7 +104,6 @@ class App():
         pygame.display.flip()
 
         self.clock.tick(FPS)
-
         # end scene alg   
     
 
