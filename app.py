@@ -77,8 +77,8 @@ class App():
         draw_plot(self.screen, list(range(len(self.best_fitness_values))),
               self.best_fitness_values, y_label="Fitness")
 
-        draw_paths(self.screen, path=[it.location for it in self.best_solution], rgb_color=PATH_BEST_SOLUTION, width=3)
-        draw_paths(self.screen, path=[it.location for it in self.population[1]], rgb_color=PATH_COLOR, width=3)
+        limit = calculate_total_events_until_budget(self.best_solution, BUDGET_MAX)
+        draw_paths(self.screen, path=[it.location for it in self.best_solution[:limit]], rgb_color=PATH_BEST_SOLUTION, width=3)
         
         print(f"Generation {self.generation} Total Distance the best {calculate_total_distance(self.best_solution):.2f}km and Total cost: R$ {calculate_total_cost_limited(self.best_solution, BUDGET_MAX):.2f}")
 
@@ -113,7 +113,8 @@ class App():
 
         draw_attractions(self.screen)     
         draw_plot(self.screen, list(range(len(self.best_fitness_values))), self.best_fitness_values, y_label="Fitness")
-        draw_paths(self.screen, [it.location for it in self.best_solutions[0]], rgb_color=PATH_BEST_SOLUTION, width=3)    
+        limit = calculate_total_events_until_budget(self.best_solutions[0], BUDGET_MAX)
+        draw_paths(self.screen, [it.location for it in self.best_solutions[0][:limit]], rgb_color=PATH_BEST_SOLUTION, width=3)    
         draw_text(self.screen, "Press 'enter' to show report", (500, 60))
 
         pygame.display.flip()
@@ -128,11 +129,13 @@ class App():
 
         y = 150
 
-        best_roadmap = self.population[0]
+        best_roadmap = self.best_solutions[len(self.best_solutions) - 1]
         total_events = calculate_total_events_until_budget(best_roadmap, BUDGET_MAX)
         for index, attraction in enumerate(best_roadmap[:total_events]):
             draw_text(self.screen, f"{attraction.name}: Custo R${attraction.cost}, Score {attraction.score}", (300, y + (index * 25)))
             
+        result = f"Total Distance {calculate_total_distance(best_roadmap):.2f}km, Total cost: R$ {calculate_total_cost_limited(best_roadmap, BUDGET_MAX):.2f} and Total score: {sum(it.score for it in best_roadmap):.0f}"
+        draw_text(self.screen, result, (300, 450))
         pygame.display.flip()
         self.clock.tick(FPS)
     # end scene in report
