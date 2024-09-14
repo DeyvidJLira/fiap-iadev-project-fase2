@@ -2,7 +2,7 @@ from setup import *
 from draw_functions import draw_attractions, draw_paths, draw_plot, draw_text
 from util import calculate_total_distance, calculate_total_events_until_budget, calculate_total_cost_limited
 from enum import Enum
-from genetic_algorithm import MutateMethod, create_roadmap, calculate_fitness, crossover, mutate
+from genetic_algorithm import create_roadmap, calculate_fitness, crossover, mutate
 
 import pygame
 import sys
@@ -91,10 +91,10 @@ class App():
             while len(new_population) < POPULATION_SIZE:
                 parent1, parent2 = random.choices(self.population[:10], k=2)
 
-                child1, child2 = crossover(parent1, parent2)
+                child1, child2 = crossover(CROSSOVER_METHOD, parent1, parent2)
 
-                child1 = mutate(MutateMethod.INVERSION, child1, MUTATION_PROBABILITY)
-                child2 = mutate(MutateMethod.INVERSION, child2, MUTATION_PROBABILITY)
+                child1 = mutate(MUTATION_METHOD, child1, MUTATION_PROBABILITY)
+                child2 = mutate(MUTATION_METHOD, child2, MUTATION_PROBABILITY)
 
                 new_population.append(child1)
                 new_population.append(child2)

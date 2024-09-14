@@ -1,4 +1,5 @@
 from attraction import Attraction
+from genetic_algorithm import CrossoverMethod, MutateMethod
 
 WIDTH_SCREEN, HEIGHT_SCREEN = 1280, 720
 WIDTH_MAP, HEIGHT_MAP = WIDTH_SCREEN /2, HEIGHT_SCREEN/2
@@ -12,6 +13,8 @@ SIZE_IMAGE = 64
 
 N_GENERATIONS = 150
 POPULATION_SIZE = 3
+CROSSOVER_METHOD = CrossoverMethod.OX
+MUTATION_METHOD = MutateMethod.INVERSION
 MUTATION_PROBABILITY = 0.1
 
 LAT_MIN, LAT_MAX = -29.3500, -29.4200
