@@ -18,7 +18,7 @@ Existe alguns requisitos que precisam serem atendidos:
 ## Screenshots
 ![Processsando](https://github.com/DeyvidJLira/fiap-iadev-project-fase2/blob/main/static/images/screenshot_1.jpg)
 ![Processamento finalizado](https://github.com/DeyvidJLira/fiap-iadev-project-fase2/blob/main/static/images/screenshot_2.jpg)
-![Testando outro modelo](https://github.com/DeyvidJLira/fiap-iadev-project-fase2/blob/main/images/static/screenshot_3.jpg)
+![Testando outro modelo](https://github.com/DeyvidJLira/fiap-iadev-project-fase2/blob/main/static/images/screenshot_3.jpg)
 
 ## Como estar organizado
 O projeto é formado pelas seguintes pastas e arquivos, com os respectivos propósitos:

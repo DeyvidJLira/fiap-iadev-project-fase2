@@ -1,7 +1,6 @@
 from setup import *
 from draw_functions import draw_attractions, draw_plot
 from util import calculate_total_distance, calculate_total_events_until_budget, calculate_total_cost_limited
-from enum import Enum
 from genetic_algorithm import create_roadmap, calculate_fitness, crossover, mutate
 
 from fastapi import FastAPI, WebSocket, Request
