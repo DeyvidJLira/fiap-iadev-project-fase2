@@ -7,6 +7,7 @@ import folium
 
 matplotlib.use("Agg")
 
+# Função destinada a gerar imagem do gráfico de Geração X Fitness e retornar o buf da imagem
 def draw_plot(x: list, y: list, x_label: str = 'Generation', y_label: str = 'Fitness') -> None:
     fig, ax = plt.subplots(figsize=(4, 3), dpi=80)
     fig.patch.set_alpha(0)
@@ -23,6 +24,7 @@ def draw_plot(x: list, y: list, x_label: str = 'Generation', y_label: str = 'Fit
     return buf
 
 
+# Função destinada a gerar os marcadores e adicionar no mapa
 def draw_attractions(map: folium.Map):
     for attraction in ATTRACTIONS:
         popup_content = f"""

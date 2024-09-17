@@ -1,6 +1,6 @@
 from setup import *
 from draw_functions import draw_attractions, draw_plot
-from util import calculate_total_distance, calculate_total_events_until_budget, calculate_total_cost_limited
+from util import calculate_total_distance_limited, calculate_total_events_until_budget, calculate_total_cost_limited
 from genetic_algorithm import create_roadmap, calculate_fitness, crossover, mutate
 
 from fastapi import FastAPI, WebSocket, Request
@@ -21,13 +21,28 @@ class GeneticVars:
         self.best_solutions = []
 
 
-app = FastAPI() 
+app = FastAPI(
+    title = "Guia Turístico Genético",
+    description = """
+Guia Turístico Genético API é uma aplicação destinada a encontrar o melhor roteiro.
+
+## Dependências:
+- FastAPI (https://fastapi.tiangolo.com/)
+- Folium (https://python-visualization.github.io/folium/latest/)
+- Uvicorn (https://www.uvicorn.org/)
+""",
+    version = "0.2.0",
+    license_info = {
+        "name": "MIT"
+    }
+) 
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.state.path_data = []
 app.state.genetic_vars = GeneticVars()
 
 
+# Função destinada a criar o mapa, incluir as atrações e retornar em HTML
 def create_map():
     app.state.map = folium.Map(
         MAP_BASE_LOCATION, 
@@ -45,6 +60,7 @@ def create_map():
     return app.state.map._repr_html_()
 
 
+# Função destinada a execução do algoritmo genético objetivando alcançar a melhor solução
 async def execute_genetic_algorithm():
     for app.state.genetic_vars.generation in range(N_GENERATIONS):
         await asyncio.sleep(0.2)
@@ -81,7 +97,9 @@ async def execute_genetic_algorithm():
         app.state.genetic_vars.population = new_population
             
 
-@app.get('/')
+@app.get('/', description="""
+Rota destinada a inicialização e retornar página contendo o mapa.
+""")
 def index(request: Request):
     app.state.path_data = []
     app.state.genetic_vars = GeneticVars()
@@ -90,13 +108,17 @@ def index(request: Request):
     return templates.TemplateResponse('map.html', {"request": request, "map_html": map_html})
 
 
-@app.get("/plot")
+@app.get("/plot", description="""
+Rota destinada a gerar o gráfico de geração x fitness e retornar como imagem png.
+""")
 async def get_plot():
     buf = draw_plot(list(range(len(app.state.genetic_vars.best_fitness_values))), app.state.genetic_vars.best_fitness_values, y_label="Fitness")
     return StreamingResponse(buf, media_type="image/png")
 
 
-@app.get("/report")
+@app.get("/report", description="""
+Rota destinada a gerar o relatório da melhor solução e retornar em texto com sintaxe HTML.
+""")
 def get_report():
     best_roadmap = app.state.genetic_vars.best_solutions[len(app.state.genetic_vars.best_solutions) - 1]
     total_events = calculate_total_events_until_budget(best_roadmap, BUDGET_MAX)
@@ -105,10 +127,11 @@ def get_report():
     for index, attraction in enumerate(best_roadmap[:total_events]):
         report += f"{index + 1}: {attraction.name}: Custo R${attraction.cost}, Score {attraction.score}<br>"
     
-    report += f"<br><b>Total Distance:</b> {calculate_total_distance(best_roadmap):.2f}km<br><b>Total cost:</b> R$ {calculate_total_cost_limited(best_roadmap, BUDGET_MAX):.2f}<br><b>Total score:</b> {sum(it.score for it in best_roadmap):.0f}"
+    report += f"<br><b>Total Distance:</b> {calculate_total_distance_limited(best_roadmap, BUDGET_MAX):.2f}km<br><b>Total Cost:</b> R$ {calculate_total_cost_limited(best_roadmap, BUDGET_MAX):.2f}<br><b>Total score:</b> {sum(it.score for it in best_roadmap):.0f}"
     return report
 
 
+# Websocket destinado a cada geração compartilhar o path da melhor solução encontrada
 @app.websocket('/ws')
 async def update(websocket: WebSocket):
     await websocket.accept()

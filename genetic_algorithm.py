@@ -1,11 +1,11 @@
 from enum import Enum
 from attraction import Attraction
 from typing import List
-from util import calculate_total_distance, calculate_total_events_until_budget, calculate_total_score_limited
+from util import calculate_total_distance_limited, calculate_total_events_until_budget, calculate_total_score_limited
 import random
 
 def calculate_fitness(roadmap: List[Attraction], budget_max: float) -> float:
-    return calculate_total_distance(roadmap) - calculate_total_events_until_budget(roadmap, budget_max) - calculate_total_score_limited(roadmap, budget_max)
+    return calculate_total_distance_limited(roadmap, budget_max) - calculate_total_events_until_budget(roadmap, budget_max) - calculate_total_score_limited(roadmap, budget_max)
 
 
 def create_roadmap(attractions) -> List[Attraction]:
