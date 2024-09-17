@@ -16,13 +16,13 @@ Existe alguns requisitos que precisam serem atendidos:
 - Quando maior o total de pontuação dos eventos juntos, melhor.
 
 ## Screenshots
-![Processsando](https://github.com/DeyvidJLira/fiap-iadev-project-fase2/blob/main/images/screenshot_1.jpg)
-![Processamento finalizado](https://github.com/DeyvidJLira/fiap-iadev-project-fase2/blob/main/images/screenshot_2.jpg)
-![Testando outro modelo](https://github.com/DeyvidJLira/fiap-iadev-project-fase2/blob/main/images/screenshot_3.jpg)
+![Processsando](https://github.com/DeyvidJLira/fiap-iadev-project-fase2/blob/main/static/images/screenshot_1.jpg)
+![Processamento finalizado](https://github.com/DeyvidJLira/fiap-iadev-project-fase2/blob/main/static/images/screenshot_2.jpg)
+![Testando outro modelo](https://github.com/DeyvidJLira/fiap-iadev-project-fase2/blob/main/images/static/screenshot_3.jpg)
 
 ## Como estar organizado
 O projeto é formado pelas seguintes pastas e arquivos, com os respectivos propósitos:
-- /images - pasta com todos arquivos de imagens que serão exibidas na execução da aplicação;
+- /static/images - pasta com todos arquivos de imagens que serão exibidas na execução da aplicação;
 - app.py - contém o código da aplicação em si;
 - attraction.py - é o modelo da atração;
 - draw_functions.py - reúne as funções de desenhar algum tipo de conteúdo na tela;

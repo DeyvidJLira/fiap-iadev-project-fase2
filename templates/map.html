@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia Turístico Genético</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet-ant-path" type="text/javascript"></script>
+    <style>
+        .title-bar {
+            background-color: white;
+            color: black;
+            padding: 10px;
+            text-align: center;
+            font-size: 24px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+        #plot {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        .modal {
+            display: none; 
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 60%;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="title-bar">Guia Turístico Genético</div>
+    
+<div id="map">
+    {{ map_html | safe }}
+</div>
+
+<img id="plot" src="/plot" alt="Fitness plot">
+
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Resultado</h2>
+        <div id="report-content"></div>
+    </div>
+</div>
+
+<script>
+    var canUpdatePlot = false
+    var polyline;
+    
+    const map = L.map('map', {
+        center: [-29.3801653,-50.8761832],
+        zoom: 13.3,
+        scrollWheelZoom: false, 
+        dragging: false,        
+        zoomControl: false,     
+        keyboard: false,        
+        touchZoom: false 
+    })
+
+    async function drawPath(path) {
+        if (polyline) {
+            map.removeLayer(polyline);
+        }
+
+        polyline = L.polyline.antPath(path, {color: 'green', weight: 3}).addTo(map);
+    }
+
+    function openModal(reportContent) {
+        const modal = document.getElementById('modal');
+        const reportDiv = document.getElementById('report-content');
+        reportDiv.innerHTML = reportContent;
+        modal.style.display = 'block';
+    }
+    
+    function closeModal() {
+        document.getElementById('modal').style.display = 'none';
+    }
+
+    document.querySelector('.close').onclick = closeModal;
+
+    const plotUpdate = setInterval(function() {
+        if(canUpdatePlot) document.getElementById("plot").src = "/plot?" + new Date().getTime(); 
+    }, 150);
+
+    async function fetchReport() {
+        try {
+            const response = await fetch('/report');
+            const data = await response.text();
+            openModal(data.replaceAll("\"",""))
+        } catch (error) {
+            openModal('Erro ao obter o relatório.')
+        }
+    }
+
+    async function connectWebSocket() {
+        const socket = new WebSocket("ws://localhost:8000/ws");
+
+        socket.onopen = function(event) {
+            canUpdatePlot = true
+        }
+
+        socket.onmessage = function(event) {
+            const obj = JSON.parse(event.data)
+            drawPath(obj.path)
+        };
+
+        socket.onclose = function() {
+            canUpdatePlot = false
+            clearInterval(plotUpdate)
+            document.getElementById("plot").src = "/plot?" + new Date().getTime(); 
+            console.log("WebSocket connection closed");
+            fetchReport()
+        };
+    }
+
+    window.onload = function() {
+        connectWebSocket();
+    };
+</script>
+
+</body>
+</html>

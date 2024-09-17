@@ -11,12 +11,6 @@ def calculate_distance(p_from: Tuple[float, float], p_target: Tuple[float, float
     return R * c 
 
 
-def geolocation_to_pixel(lat, lon, lat_min, lat_max, lon_min, lon_max, width, height):
-    x = (lon - lon_min) / (lon_max - lon_min) * width + width/2 # (width/2) é um modificador para posicionar em uma área desejada da cena
-    y = (lat_max - lat) / (lat_max - lat_min) * height + height/2.5 # (height/2.5)  é um modificador para posicionar em uma área desejada da cena
-    return int(abs(x)), int(abs(y))
-    
-
 def calculate_total_distance(roadmap: List[Attraction]) -> float:
     total_distance = sum(
         calculate_distance(

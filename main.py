@@ -1,10 +1,5 @@
-from app import App
+from app import app
+import uvicorn
 
 if __name__ == '__main__':
-    app = App()
-    app.run()
-
-
-    
-
-    
+    uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=True)
