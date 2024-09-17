@@ -1,11 +1,11 @@
 from setup import *
 from draw_functions import draw_attractions, draw_plot
-from util import calculate_total_distance_limited, calculate_total_events_until_budget, calculate_total_cost_limited
+from util import calculate_total_distance_limited, calculate_total_events_until_budget, calculate_total_cost_limited, calculate_total_score_limited
 from genetic_algorithm import create_roadmap, calculate_fitness, crossover, mutate
 
 from fastapi import FastAPI, WebSocket, Request
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 import asyncio
 
@@ -116,18 +116,21 @@ async def get_plot():
     return StreamingResponse(buf, media_type="image/png")
 
 
-@app.get("/report", description="""
+@app.get("/report", response_class=HTMLResponse, description="""
 Rota destinada a gerar o relatório da melhor solução e retornar em texto com sintaxe HTML.
 """)
 def get_report():
     best_roadmap = app.state.genetic_vars.best_solutions[len(app.state.genetic_vars.best_solutions) - 1]
     total_events = calculate_total_events_until_budget(best_roadmap, BUDGET_MAX)
 
-    report = ""
-    for index, attraction in enumerate(best_roadmap[:total_events]):
-        report += f"{index + 1}: {attraction.name}: Custo R${attraction.cost}, Score {attraction.score}<br>"
+    report = "<table><th>Ordem</th><th>Evento</th><th>Custo</th><th>Avaliação</th>"
     
-    report += f"<br><b>Total Distance:</b> {calculate_total_distance_limited(best_roadmap, BUDGET_MAX):.2f}km<br><b>Total Cost:</b> R$ {calculate_total_cost_limited(best_roadmap, BUDGET_MAX):.2f}<br><b>Total score:</b> {sum(it.score for it in best_roadmap):.0f}"
+    for index, attraction in enumerate(best_roadmap[:total_events]):
+        report += f"<tr><td>{index + 1}</td><td>{attraction.name}</td><td>R${attraction.cost}</td><td>{attraction.score}</td></tr>"
+    
+    report += "</table>"
+
+    report += f"<br><b>Total Distance:</b> {calculate_total_distance_limited(best_roadmap, BUDGET_MAX):.2f}km<br><b>Total Cost:</b> R$ {calculate_total_cost_limited(best_roadmap, BUDGET_MAX):.2f}<br><b>Total score:</b> {calculate_total_score_limited(best_roadmap, BUDGET_MAX):.0f}"
     return report
 
 

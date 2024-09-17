@@ -1,4 +1,3 @@
-from typing import List, Tuple
 import matplotlib
 from matplotlib import pyplot as plt
 import io
