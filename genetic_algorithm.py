@@ -4,10 +4,11 @@ from typing import List
 from util import calculate_total_distance_limited, calculate_total_events_until_budget, calculate_total_score_limited
 import random
 
+# Função destinada a dar uma pontuação de aptidão para uma determinada solução. No atual contexto, o mais apto sempre terá um valor menor.
 def calculate_fitness(roadmap: List[Attraction], budget_max: float) -> float:
     return calculate_total_distance_limited(roadmap, budget_max) - calculate_total_events_until_budget(roadmap, budget_max) - calculate_total_score_limited(roadmap, budget_max)
 
-
+#  Cria uma solução de intineário de forma aleatória.
 def create_roadmap(attractions) -> List[Attraction]:
     attractions_cp = attractions[:]
     roadmap = []
@@ -17,81 +18,75 @@ def create_roadmap(attractions) -> List[Attraction]:
         roadmap.append(attraction)
     return roadmap
 
+# Enum dos métodos crossover disponíves nessa aplicação
 class CrossoverMethod(Enum):
-    OX = 1
-    PMX = 2
+    OX1 = 1
+    OX2 = 2
     CX = 3
-    OX1 = 4
 
-
+# Chama a função de cruzamento genético indicado e retorna dois filhos
 def crossover(method: CrossoverMethod, roadmap1: List[Attraction], roadmap2: List[Attraction]) -> tuple[List[Attraction], List[Attraction]]:
     match method:
-        case CrossoverMethod.OX: return crossover_ox(roadmap1, roadmap2)
-        case CrossoverMethod.PMX: return crossover_pmx(roadmap1, roadmap2)
-        case CrossoverMethod.CX: return crossover_cx(roadmap1, roadmap2)
         case CrossoverMethod.OX1: return crossover_ox1(roadmap1, roadmap2)
+        case CrossoverMethod.OX2: return crossover_ox2(roadmap1, roadmap2)
+        case CrossoverMethod.CX: return crossover_cx(roadmap1, roadmap2)
         
-# Order Crossover
-def crossover_ox(parent1: List[Attraction], parent2: List[Attraction]) -> tuple[List[Attraction], List[Attraction]]:
-    size = len(parent1)
+        
+# Ordered Crossover a partir de uma subsequência e devolve dois filhos
+def crossover_ox1(parent1: List[Attraction], parent2: List[Attraction]) -> tuple[List[Attraction], List[Attraction]]:
+    size = len(parent1) # isso é por conta que o tamanho dos pais são sempre iguais
 
-    index1, index2 = sorted(random.sample(range(size), 2))
+    start_index = random.randint(0, size -1)
+    end_index = random.randint(start_index + 1, size)
 
-    child1 = parent1[index1:index2]
-    child2 = parent2[index1:index2]
+    child1 = parent1[start_index:end_index]
+    child2 = parent2[start_index:end_index]
 
-    current_pos = index2
-    for gene in parent2:
-        if gene not in child1:
-            if current_pos >= size:
-                current_pos = 0
-            child1.insert(current_pos, gene)
-            current_pos += 1
+    def fill_child(child, parent_origin_length, parent_target):
+        remaining_positions = [i for i in range(parent_origin_length) if i < start_index or i >= end_index]
+        remaining_genes = [ gene for gene in parent_target if gene not in child]    
 
-    current_pos = index2
-    for gene in parent1:
-        if gene not in child2:
-            if current_pos >= size:
-                current_pos = 0
-            child2.insert(current_pos, gene)
-            current_pos += 1
+        for position, gene in zip(remaining_positions, remaining_genes):
+            child.insert(position, gene)
 
+        return child
+
+    child1 = fill_child(child1, size, parent2)
+    child2 = fill_child(child1, size, parent1)
+    
     return child1, child2
 
-# Partially Mapped Crossover
-def crossover_pmx(parent1: List[Attraction], parent2: List[Attraction]) -> tuple[List[Attraction], List[Attraction]]:
-    size = len(parent1)
-    
-    index1, index2 = sorted(random.sample(range(size), 2))
+# Ordered Crossover a partir de um conjuto de posições aleatórias e devolve dois filhos
+def crossover_ox2(parent1: List[Attraction], parent2: List[Attraction]) -> tuple[List[Attraction], List[Attraction]]:
+    size = len(parent1)  # isso é por conta que o tamanho dos pais são sempre iguais
 
     child1, child2 = [None] * size, [None] * size
 
-    child1[index1:index2] = parent1[index1:index2]
-    child2[index1:index2] = parent2[index1:index2]
+    n_positions = random.randint(1, size - 1)
+    positions = random.sample(range(size), n_positions)
 
-    for i in range(index1, index2):
-        gene = parent2[i]
-        if gene not in child1:
-            while child1[parent1.index(gene)] is not None:
-                gene = parent2[parent1.index(gene)]
-            child1[parent1.index(gene)] = parent2[i]
+    for position in positions:
+        child1[position] = parent1[position]
+        child2[position] = parent2[position]
+    
 
-    for i in range(index1, index2):
-        gene = parent1[i]
-        if gene not in child2:
-            while child2[parent2.index(gene)] is not None:
-                gene = parent1[parent2.index(gene)]
-            child2[parent2.index(gene)] = parent1[i]
+    def fill_child(child: List[Attraction], parent_target: List[Attraction]) :
+        current_pos = 0
+        for gene in parent_target:
+            if gene not in child:
+                while child[current_pos] is not None:
+                    current_pos += 1
+                child[current_pos] = gene
 
-    for i in range(size):
-        if child1[i] is None:
-            child1[i] = parent2[i]
-        if child2[i] is None:
-            child2[i] = parent1[i]
+        return child
 
+    child1 = fill_child(child1, parent2)
+    child2 = fill_child(child1, parent1)
+    
     return child1, child2
 
-# Cycle Crossover
+
+# Cycle Crossover para troca de ciclos do material genético dos pais e devolve dois filhos
 def crossover_cx(parent1: List[Attraction], parent2: List[Attraction]) -> tuple[List[Attraction], List[Attraction]]:
     size = len(parent1)
     
@@ -107,47 +102,25 @@ def crossover_cx(parent1: List[Attraction], parent2: List[Attraction]) -> tuple[
         child1[i] = parent1[i]
         child2[i] = parent2[i]
 
-    for i in range(size):
-        if child1[i] is None:
-            child1[i] = parent2[i]
-        if child2[i] is None:
-            child2[i] = parent1[i]
+    def fill_when_none(size: int, child: List[Attraction], parent: List[Attraction]):
+        for i in range(size):
+            if child[i] is None:
+                child[i] = parent[i]
+        return child
+
+    child1 = fill_when_none(size, child1, parent2)
+    child2 = fill_when_none(size, child2, parent1)
 
     return child1, child2
 
-# Ordered Crossover
-def crossover_ox1(parent1: List[Attraction], parent2: List[Attraction]) -> tuple[List[Attraction], List[Attraction]]:
-    parent1_lenght = len(parent1)
-    parent2_lenght = len(parent2)
-
-    start_index = random.randint(0, parent1_lenght -1)
-    end_index = random.randint(start_index + 1, parent1_lenght)
-
-    child1 = parent1[start_index:end_index]
-    child2 = parent2[start_index:end_index]
-
-    remaining_positions = [i for i in range(parent1_lenght) if i < start_index or i >= end_index]
-    remaining_genes = [ gene for gene in parent2 if gene not in child1]
-
-    for position, gene in zip(remaining_positions, remaining_genes):
-        child1.insert(position, gene)
-
-    remaining_positions = [i for i in range(parent2_lenght) if i < start_index or i >= end_index]
-    remaining_genes = [ gene for gene in parent1 if gene not in child2]
-
-    for position, gene in zip(remaining_positions, remaining_genes):
-        child2.insert(position, gene)
-    
-    return child1, child2
-
-
+# Enum dos métodos de mutação disponíves nessa aplicação
 class MutateMethod(Enum):
     SWAP = 1
     INVERSION = 2
     INSERTION = 3
     SHUFFLE = 4
 
-
+# Chama a função de mutação indicado em cima da solução passada segundo a probabilidade de mutação
 def mutate(method: MutateMethod, roadmap: List[Attraction], mutation_probability: float) -> List[Attraction]:
     if random.random() < mutation_probability:
         if len(roadmap) < 2:
@@ -161,7 +134,7 @@ def mutate(method: MutateMethod, roadmap: List[Attraction], mutation_probability
             
     return roadmap
 
-
+# Função de mutação de troca de posição de genes do material genético
 def mutateSwap(roadmap: List[Attraction]) -> List[Attraction]:
     mutated_solution = roadmap[:]
     final_position_list = len(roadmap) - 1
@@ -176,7 +149,7 @@ def mutateSwap(roadmap: List[Attraction]) -> List[Attraction]:
 
     return mutated_solution
 
-
+# Função de mutação que realiza a inversão dos genes de uma subsequencia
 def mutateInversion(roadmap: List[Attraction]) -> List[Attraction]:
     mutated_solution = roadmap[:]
     final_position_list = len(roadmap) - 1
@@ -188,7 +161,7 @@ def mutateInversion(roadmap: List[Attraction]) -> List[Attraction]:
 
     return mutated_solution
 
-
+# Função de mutação que visa tirar um gene de uma posição e coloca-lo em outra, alterando assim a ordem
 def mutateInsertion(roadmap: List[Attraction]) -> List[Attraction]:
     mutated_solution = roadmap[:]
     final_position_list = len(roadmap) - 1
@@ -202,7 +175,7 @@ def mutateInsertion(roadmap: List[Attraction]) -> List[Attraction]:
 
     return mutated_solution
 
-
+# Função de mutação que visa embaralhar os genes de uma subsequência
 def mutateShuffle(roadmap: List[Attraction]) -> List[Attraction]:
     mutated_solution = roadmap[:]
     final_position_list = len(roadmap) - 1

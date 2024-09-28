@@ -6,3 +6,14 @@ class Attraction:
         self.cost = cost
         self.score = score
         self.location = location
+
+    def __repr__(self):
+        return f'Attraction({self.name})'
+
+    def __eq__(self, other):
+        if isinstance(other, Attraction):
+            return self.name == other.name
+        return False
+    
+    def __hash__(self):
+        return hash(self.name)

@@ -1,13 +1,13 @@
 from attraction import Attraction
 from genetic_algorithm import CrossoverMethod, MutateMethod
 
-MAP_BASE_LOCATION = [-29.3801653,-50.8761832]
+MAP_BASE_LOCATION = [-29.3801653,-50.8761832] # Geolocalização base para renderização do mapa
 
-N_GENERATIONS = 100
-POPULATION_SIZE = 5
-CROSSOVER_METHOD = CrossoverMethod.CX
-MUTATION_METHOD = MutateMethod.INVERSION
-MUTATION_PROBABILITY = 0.1
+N_GENERATIONS = 150 # Total de gerações
+POPULATION_SIZE = 3 # Tamanho da população
+CROSSOVER_METHOD = CrossoverMethod.OX2 # Método de cruzamento à ser utilizado pela aplicação
+MUTATION_METHOD = MutateMethod.SWAP # Método de mutação à ser utilizado pela aplicação
+MUTATION_PROBABILITY = 0.1 # Probabilidade da mutação ocorrer durando a execução da aplicação
 
 ATTRACTIONS = [
     Attraction("Mini Mundo", "/static/images/mini_mundo.jpg", 53, 4.5, [-29.3876033,-50.8704896]),
@@ -20,4 +20,4 @@ ATTRACTIONS = [
     Attraction("Casa da Velha Bruxa", "/static/images/casa_velha_bruxa.jpg", 120, 2.5, [-29.3601653,-50.8761832])
 ]
 
-BUDGET_MAX = 200
+BUDGET_MAX = 200 # Orçamento máximo do intineário resultante

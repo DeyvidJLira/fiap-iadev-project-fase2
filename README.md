@@ -16,22 +16,45 @@ Existe alguns requisitos que precisam serem atendidos:
 - Quando maior o total de pontuação dos eventos juntos, melhor.
 
 ## Screenshots
-![Processsando](https://github.com/DeyvidJLira/fiap-iadev-project-fase2/blob/main/static/images/screenshot_1.jpg)
-![Processamento finalizado](https://github.com/DeyvidJLira/fiap-iadev-project-fase2/blob/main/static/images/screenshot_2.jpg)
-![Testando outro modelo](https://github.com/DeyvidJLira/fiap-iadev-project-fase2/blob/main/static/images/screenshot_3.jpg)
-
-## Como estar organizado
-O projeto é formado pelas seguintes pastas e arquivos, com os respectivos propósitos:
-- /static/images - pasta com todos arquivos de imagens que serão exibidas na execução da aplicação;
-- app.py - contém o código da aplicação em si;
-- attraction.py - é o modelo da atração;
-- draw_functions.py - reúne as funções de desenhar algum tipo de conteúdo na tela;
-- main.py - ponto de partida para execução do projeto;
-- setup.py - contém várias constantes utilizadas no projeto;
-- util.py - contém algumas funções utilitárias, como por exemplo converter geolocalização para pixel.
+![Processsando](https://github.com/DeyvidJLira/fiap-iadev-project-fase2/blob/main/screenshots/screenshot_1.jpg)
+![Processamento finalizado](https://github.com/DeyvidJLira/fiap-iadev-project-fase2/blob/main/screenshots/screenshot_2.jpg)
+![Testando outro modelo](https://github.com/DeyvidJLira/fiap-iadev-project-fase2/blob/main/screenshots/screenshot_3.jpg)
 
 ## Testes e Resultados
-Em breve...
+**Foi considerado os seguintes hiper parametros possíveis:**
+```
+population_sizes = [3, 5, 7]
+n_generations_list = [50, 100, 150]
+crossover_methods = [CrossoverMethod.OX1, CrossoverMethod.OX2, CrossoverMethod.CX]
+mutation_methods = [MutateMethod.SWAP, MutateMethod.INSERTION, MutateMethod.INVERSION, MutateMethod.SHUFFLE]
+mutation_probabilities = [0.05, 0.1, 0.2]
+```
+
+**Criado dois métodos para ser possível comparar**
+```
+# Identifica a melhor solução dados os paramêtros
+def get_winner_genetic_algorithm(
+        population_size: int,
+        n_generations: int,
+        crossover_method: CrossoverMethod,
+        mutation_method: MutateMethod, 
+        mutation_probability: float) -> dict:
+    ...
+
+# Monta uma tabela com o resultado de vencedores conforme diversas combinações dos hiper parametros
+def grid_search_genetic_algorithm():
+    ...
+```
+
+![Tabela de resultado](https://github.com/DeyvidJLira/fiap-iadev-project-fase2/blob/main/screenshots/result_table.jpg)
+
+
+**Gráfico visual das melhores soluções encontradas ao longo das gerações**
+![Gráfico](https://github.com/DeyvidJLira/fiap-iadev-project-fase2/blob/main/screenshots/picture_about_best_fitness_x_generation_x_crossover.png)
+
+**Ordenando pela melhor aptidão e menor número de gerações necessários para alcançar**
+![Gráfico](https://github.com/DeyvidJLira/fiap-iadev-project-fase2/blob/main/screenshots/result_table_ordered.jpg)
+
 
 ## Créditos
 Copyright (C) by Deyvid Jaguaribe

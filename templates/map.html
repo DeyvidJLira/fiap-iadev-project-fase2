@@ -62,6 +62,17 @@
             text-decoration: none;
             cursor: pointer;
         }
+        th {
+            text-align: left;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px; 
+        }
     </style>
 </head>
 <body>
@@ -101,7 +112,7 @@
             map.removeLayer(polyline);
         }
 
-        polyline = L.polyline.antPath(path, {color: 'green', weight: 3}).addTo(map);
+        polyline = L.polyline.antPath(path, {color: 'green', weight: 3, "delay": 800,}).addTo(map);
     }
 
     function openModal(reportContent) {
@@ -119,7 +130,7 @@
 
     const plotUpdate = setInterval(function() {
         if(canUpdatePlot) document.getElementById("plot").src = "/plot?" + new Date().getTime(); 
-    }, 150);
+    }, 200);
 
     async function fetchReport() {
         try {
