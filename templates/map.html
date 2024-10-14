@@ -7,73 +7,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://unpkg.com/leaflet-ant-path" type="text/javascript"></script>
-    <style>
-        .title-bar {
-            background-color: white;
-            color: black;
-            padding: 10px;
-            text-align: center;
-            font-size: 24px;
-            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
-            position: fixed;
-            width: 100%;
-            top: 0;
-            left: 0;
-            z-index: 1000;
-        }
-        #map {
-            height: 100%;
-            width: 100%;
-        }
-        #plot {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            z-index: 1000;
-        }
-        .modal {
-            display: none; 
-            position: fixed;
-            z-index: 1001;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
-            padding-top: 60px;
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: 5% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 60%;
-        }
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        th {
-            text-align: left;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid black;
-            padding: 8px; 
-        }
-    </style>
+    <link href="/static/css/main.css" rel="stylesheet">
 </head>
 <body>
 
@@ -84,6 +18,10 @@
 </div>
 
 <img id="plot" src="/plot" alt="Fitness plot">
+
+<div id="reportButtonContainer">
+    <button id="reportButton" onclick="fetchReport()">Ver Relatório</button>
+</div>
 
 <div id="modal" class="modal">
     <div class="modal-content">
@@ -98,13 +36,14 @@
     var polyline;
     
     const map = L.map('map', {
-        center: [-29.3801653,-50.8761832],
-        zoom: 13.3,
+        center: [-29.3863118,-50.881217],
+        zoom: 14.5,
         scrollWheelZoom: false, 
         dragging: false,        
         zoomControl: false,     
         keyboard: false,        
-        touchZoom: false 
+        touchZoom: false,
+        doubleClickZoom: false
     })
 
     async function drawPath(path) {
@@ -159,6 +98,7 @@
             clearInterval(plotUpdate)
             document.getElementById("plot").src = "/plot?" + new Date().getTime(); 
             console.log("WebSocket connection closed");
+            document.getElementById('reportButton').style.display = 'block';
             fetchReport()
         };
     }

@@ -52,7 +52,7 @@ def crossover_ox1(parent1: List[Attraction], parent2: List[Attraction]) -> tuple
         return child
 
     child1 = fill_child(child1, size, parent2)
-    child2 = fill_child(child1, size, parent1)
+    child2 = fill_child(child2, size, parent1)
     
     return child1, child2
 
@@ -81,7 +81,7 @@ def crossover_ox2(parent1: List[Attraction], parent2: List[Attraction]) -> tuple
         return child
 
     child1 = fill_child(child1, parent2)
-    child2 = fill_child(child1, parent1)
+    child2 = fill_child(child2, parent1)
     
     return child1, child2
 
@@ -123,19 +123,16 @@ class MutateMethod(Enum):
 # Chama a função de mutação indicado em cima da solução passada segundo a probabilidade de mutação
 def mutate(method: MutateMethod, roadmap: List[Attraction], mutation_probability: float) -> List[Attraction]:
     if random.random() < mutation_probability:
-        if len(roadmap) < 2:
-            return roadmap
-        
         match method:
-            case MutateMethod.SWAP: return mutateSwap(roadmap)
-            case MutateMethod.INVERSION: return mutateInversion(roadmap)
-            case MutateMethod.INSERTION: return mutateInsertion(roadmap)
-            case MutateMethod.SHUFFLE: return mutateShuffle(roadmap)
+            case MutateMethod.SWAP: return mutate_swap(roadmap)
+            case MutateMethod.INVERSION: return mutate_inversion(roadmap)
+            case MutateMethod.INSERTION: return mutate_insertion(roadmap)
+            case MutateMethod.SHUFFLE: return mutate_shuffle(roadmap)
             
     return roadmap
 
 # Função de mutação de troca de posição de genes do material genético
-def mutateSwap(roadmap: List[Attraction]) -> List[Attraction]:
+def mutate_swap(roadmap: List[Attraction]) -> List[Attraction]:
     mutated_solution = roadmap[:]
     final_position_list = len(roadmap) - 1
 
@@ -150,7 +147,7 @@ def mutateSwap(roadmap: List[Attraction]) -> List[Attraction]:
     return mutated_solution
 
 # Função de mutação que realiza a inversão dos genes de uma subsequencia
-def mutateInversion(roadmap: List[Attraction]) -> List[Attraction]:
+def mutate_inversion(roadmap: List[Attraction]) -> List[Attraction]:
     mutated_solution = roadmap[:]
     final_position_list = len(roadmap) - 1
 
@@ -162,7 +159,7 @@ def mutateInversion(roadmap: List[Attraction]) -> List[Attraction]:
     return mutated_solution
 
 # Função de mutação que visa tirar um gene de uma posição e coloca-lo em outra, alterando assim a ordem
-def mutateInsertion(roadmap: List[Attraction]) -> List[Attraction]:
+def mutate_insertion(roadmap: List[Attraction]) -> List[Attraction]:
     mutated_solution = roadmap[:]
     final_position_list = len(roadmap) - 1
 
@@ -176,7 +173,7 @@ def mutateInsertion(roadmap: List[Attraction]) -> List[Attraction]:
     return mutated_solution
 
 # Função de mutação que visa embaralhar os genes de uma subsequência
-def mutateShuffle(roadmap: List[Attraction]) -> List[Attraction]:
+def mutate_shuffle(roadmap: List[Attraction]) -> List[Attraction]:
     mutated_solution = roadmap[:]
     final_position_list = len(roadmap) - 1
 

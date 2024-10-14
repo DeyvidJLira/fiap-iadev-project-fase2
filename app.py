@@ -31,7 +31,7 @@ Guia Turístico Genético API é uma aplicação destinada a encontrar o melhor 
 - Folium (https://python-visualization.github.io/folium/latest/)
 - Uvicorn (https://www.uvicorn.org/)
 """,
-    version = "0.4.0",
+    version = "0.5.0",
     license_info = {
         "name": "MIT"
     }
@@ -46,14 +46,15 @@ app.state.genetic_vars = GeneticVars()
 def create_map():
     app.state.map = folium.Map(
         MAP_BASE_LOCATION, 
-        zoom_start=13.3, 
+        zoom_start=ZOOM_START, 
         tiles="cartodb positron",
         scrollWheelZoom=False,
+        doubleClickZoom= False,
         dragging=False,        
         zoomControl=False,
         keyboard=False,        
         touchZoom=False,    
-        attributionControl=False
+        attributionControl=False,
     )
     draw_attractions(app.state.map)
 
@@ -130,7 +131,7 @@ def get_report():
     
     report += "</table>"
 
-    report += f"<br><b>Distância total:</b> {calculate_total_distance_limited(best_roadmap, BUDGET_MAX):.2f}km<br><b>Custo total:</b> R$ {calculate_total_cost_limited(best_roadmap, BUDGET_MAX):.2f}<br><b>Pontuação total:</b> {calculate_total_score_limited(best_roadmap, BUDGET_MAX):.0f}"
+    report += f"<br><b>Distância total:</b> {calculate_total_distance_limited(best_roadmap, BUDGET_MAX):.2f}km<br><b>Custo total:</b> R$ {calculate_total_cost_limited(best_roadmap, BUDGET_MAX):.2f}<br><b>Pontuação total:</b> {calculate_total_score_limited(best_roadmap, BUDGET_MAX):.1f}"
     return report
 
 
